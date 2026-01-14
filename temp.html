@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modern Temp Converter</title>
+    <style>
+        :root {
+            --primary-color: #6366f1;
+            --bg-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --card-bg: rgba(255, 255, 255, 0.95);
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background: var(--bg-gradient);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .converter-card {
+            background: var(--card-bg);
+            padding: 2.5rem;
+            border-radius: 20px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            width: 100%;
+            max-width: 400px;
+            transition: transform 0.3s ease;
+        }
+
+        h2 {
+            margin-top: 0;
+            margin-bottom: 1.5rem;
+            color: #1f2937;
+            font-weight: 800;
+            font-size: 1.75rem;
+            text-align: center;
+        }
+
+        .input-group {
+            margin-bottom: 1.25rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 0.85rem;
+            color: #4b5563;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.025em;
+        }
+
+        input[type="number"], select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.2s;
+            outline: none;
+            box-sizing: border-box;
+        }
+
+        input:focus, select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+        }
+
+        .unit-controls {
+            display: grid;
+            grid-template-columns: 1fr 40px 1fr;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 1.5rem;
+        }
+
+        .swap-btn {
+            background: #f3f4f6;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 15px;
+            transition: background 0.2s;
+        }
+
+        .swap-btn:hover {
+            background: #e5e7eb;
+        }
+
+        #result-area {
+            margin-top: 1.5rem;
+            padding: 1.5rem;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .result-label {
+            font-size: 0.8rem;
+            color: #64748b;
+            margin-bottom: 5px;
+        }
+
+        .result-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            word-break: break-all;
+        }
+
+        .error {
+            color: #ef4444;
+            font-size: 0.85rem;
+            margin-top: 5px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="converter-card">
+    <h2>Temp Converter</h2>
+
+    <div class="input-group">
+        <label for="tempInput">Degrees</label>
+        <input type="number" id="tempInput" placeholder="Enter value..." oninput="convertTemperature()">
+        <div id="error-msg" class="error">Please enter a valid number</div>
+    </div>
+
+    <div class="unit-controls">
+        <div class="input-group">
+            <label>From</label>
+            <select id="unitFrom" onchange="convertTemperature()">
+                <option value="celsius">Celsius (°C)</option>
+                <option value="fahrenheit" selected>Fahrenheit (°F)</option>
+                <option value="kelvin">Kelvin (K)</option>
+            </select>
+        </div>
+
+        <button class="swap-btn" onclick="swapUnits()" title="Swap Units">
+            ⇅
+        </button>
+
+        <div class="input-group">
+            <label>To</label>
+            <select id="unitTo" onchange="convertTemperature()">
+                <option value="celsius" selected>Celsius (°C)</option>
+                <option value="fahrenheit">Fahrenheit (°F)</option>
+                <option value="kelvin">Kelvin (K)</option>
+            </select>
+        </div>
+    </div>
+
+    <div id="result-area">
+        <div class="result-label">Resulting Temperature</div>
+        <div id="display-value" class="result-value">--</div>
+    </div>
+</div>
+
+<script>
+    function swapUnits() {
+        const from = document.getElementById('unitFrom');
+        const to = document.getElementById('unitTo');
+        const temp = from.value;
+        from.value = to.value;
+        to.value = temp;
+        convertTemperature();
+    }
+
+    function convertTemperature() {
+        const inputVal = document.getElementById('tempInput').value;
+        const unitFrom = document.getElementById('unitFrom').value;
+        const unitTo = document.getElementById('unitTo').value;
+        const resultDisplay = document.getElementById('display-value');
+        const errorMsg = document.getElementById('error-msg');
+
+        if (inputVal === "") {
+            resultDisplay.innerText = "--";
+            return;
+        }
+
+        const temp = parseFloat(inputVal);
+        let result = 0;
+        let unitSymbol = "";
+
+        // Core logic
+        if (unitFrom === unitTo) {
+            result = temp;
+        } else if (unitFrom === "celsius") {
+            result = (unitTo === "fahrenheit") ? (temp * 9/5) + 32 : temp + 273.15;
+        } else if (unitFrom === "fahrenheit") {
+            const toCelsius = (temp - 32) * 5/9;
+            result = (unitTo === "celsius") ? toCelsius : toCelsius + 273.15;
+        } else if (unitFrom === "kelvin") {
+            const toCelsius = temp - 273.15;
+            result = (unitTo === "celsius") ? toCelsius : (toCelsius * 9/5) + 32;
+        }
+
+        // Set Symbol
+        switch(unitTo) {
+            case 'celsius': unitSymbol = "°C"; break;
+            case 'fahrenheit': unitSymbol = "°F"; break;
+            case 'kelvin': unitSymbol = "K"; break;
+        }
+
+        // Formatting result to avoid long decimals
+        resultDisplay.innerText = `${Number(result.toFixed(2))} ${unitSymbol}`;
+    }
+</script>
+</body>
+</html>

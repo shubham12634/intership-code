@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZenList Pro | Focus & Organize</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --bg: #f8fafc;
+            --card: #ffffff;
+            --text-main: #1e293b;
+            --text-sub: #64748b;
+            --border: #e2e8f0;
+            --sidebar: #f1f5f9;
+            --danger: #ef4444;
+        }
+
+        [data-theme="dark"] {
+            --bg: #0f172a;
+            --card: #1e293b;
+            --text-main: #f1f5f9;
+            --text-sub: #94a3b8;
+            --border: #334155;
+            --sidebar: #1e293b;
+            --card: #0f172a;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--text-main);
+            transition: 0.3s;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 5%;
+            border-bottom: 1px solid var(--border);
+            background: var(--card);
+        }
+
+        .dashboard-container {
+            max-width: 1100px;
+            margin: 40px auto;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            min-height: 650px;
+            overflow: hidden;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Sidebar & Timer */
+        .sidebar {
+            background: var(--sidebar);
+            padding: 30px 20px;
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .pomodoro-card {
+            background: var(--primary);
+            color: white;
+            padding: 20px;
+            border-radius: 16px;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .timer-display { font-size: 2rem; font-weight: 700; margin: 10px 0; }
+        
+        .timer-btn {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        /* Task Area */
+        .main-view { padding: 40px; }
+
+        .input-box {
+            display: grid;
+            grid-template-columns: 1fr auto auto;
+            gap: 10px;
+            background: var(--bg);
+            padding: 10px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            margin-bottom: 30px;
+        }
+
+        input[type="text"], select {
+            border: none;
+            background: transparent;
+            color: var(--text-main);
+            outline: none;
+            padding: 10px;
+        }
+
+        .priority-tag {
+            font-size: 0.7rem;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .high { background: #fee2e2; color: #ef4444; }
+        .med { background: #fef3c7; color: #d97706; }
+        .low { background: #dcfce7; color: #16a34a; }
+
+        .task-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px;
+            border-bottom: 1px solid var(--border);
+            animation: fadeIn 0.3s ease;
+        }
+
+        .task-content { display: flex; align-items: center; gap: 12px; }
+
+        .delete-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-sub);
+            cursor: pointer;
+            padding: 5px;
+            transition: 0.2s;
+        }
+
+        .delete-btn:hover { color: var(--danger); }
+
+        .btn-add {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } }
+    </style>
+</head>
+<body data-theme="light">
+
+    <nav>
+        <div style="font-weight:800; color:var(--primary)">ZENLIST PRO</div>
+        <div>
+            <button onclick="toggleTheme()" style="background:none; border:1px solid var(--border); padding:8px; border-radius:8px; cursor:pointer; color:var(--text-main)">🌓 Toggle Theme</button>
+        </div>
+    </nav>
+
+    <div class="dashboard-container">
+        <aside class="sidebar">
+            <div>
+                <h3 style="margin-left:15px">Focus</h3>
+                <div class="pomodoro-card">
+                    <div style="font-size:0.8rem; opacity:0.8">Focus Session</div>
+                    <div class="timer-display" id="timer">25:00</div>
+                    <button class="timer-btn" onclick="toggleTimer()" id="timerBtn">Start</button>
+                </div>
+            </div>
+            
+            <div style="color: var(--text-sub); font-size: 0.8rem; text-align: center;">
+                Efficiency is doing things right;<br>Effectiveness is doing the right things.
+            </div>
+        </aside>
+
+        <main class="main-view">
+            <h2>Manage Tasks</h2>
+            <div class="input-box">
+                <input type="text" id="taskInput" placeholder="What needs to be done?">
+                <select id="priorityInput">
+                    <option value="low">Low</option>
+                    <option value="med">Medium</option>
+                    <option value="high">High</option>
+                </select>
+                <button class="btn-add" onclick="addTask()">Add</button>
+            </div>
+
+            <div id="taskList">
+                </div>
+        </main>
+    </div>
+
+    <script>
+        // --- Task Management ---
+        function addTask() {
+            const input = document.getElementById('taskInput');
+            const priority = document.getElementById('priorityInput');
+            const list = document.getElementById('taskList');
+            
+            if (!input.value.trim()) return;
+
+            const taskDiv = document.createElement('div');
+            taskDiv.className = 'task-item';
+            taskDiv.innerHTML = `
+                <div class="task-content">
+                    <input type="checkbox">
+                    <span>${input.value}</span>
+                    <span class="priority-tag ${priority.value}">${priority.value}</span>
+                </div>
+                <button class="delete-btn" onclick="this.parentElement.remove()">✕ Delete</button>
+            `;
+            
+            list.prepend(taskDiv);
+            input.value = "";
+        }
+
+        // --- Pomodoro Timer ---
+        let timeLeft = 1500; // 25 minutes
+        let timerId = null;
+
+        function toggleTimer() {
+            const btn = document.getElementById('timerBtn');
+            if (timerId) {
+                clearInterval(timerId);
+                timerId = null;
+                btn.innerText = "Resume";
+            } else {
+                btn.innerText = "Pause";
+                timerId = setInterval(() => {
+                    timeLeft--;
+                    updateTimerDisplay();
+                    if (timeLeft <= 0) {
+                        clearInterval(timerId);
+                        alert("Time is up! Take a break.");
+                    }
+                }, 1000);
+            }
+        }
+
+        function updateTimerDisplay() {
+            const mins = Math.floor(timeLeft / 60);
+            const secs = timeLeft % 60;
+            document.getElementById('timer').innerText = 
+                `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+        }
+
+        // --- Theme Toggle ---
+        function toggleTheme() {
+            const current = document.body.getAttribute('data-theme');
+            document.body.setAttribute('data-theme', current === 'light' ? 'dark' : 'light');
+        }
+
+        // Initialize some default tasks
+        window.onload = () => {
+            document.getElementById('taskInput').value = "Design new mobile app";
+            document.getElementById('priorityInput').value = "high";
+            addTask();
+        };
+    </script>
+</body>
+</html>
